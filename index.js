@@ -1,7 +1,11 @@
 import express from "express";
 import homeRouter from "./src/routes/home.router.js";
+import userRouter from "./src/routes/user.router.js";
+import authRouter from "./src/routes/auth.router.js";
+import publicRouter from "./src/routes/public.router.js";
 import mongoose from "mongoose";
 import { configDotenv } from "dotenv";
+import auth from "./src/middlewares/auth,js";
 configDotenv();
 mongoose
   .connect(process.env.MONGO_URL)
@@ -18,11 +22,10 @@ mongoose
     console.log("error connectiong to DB ", error);
   });
 const app = express();
-const PORT = 8080;
-
-// app.get("/", (request, response, next) => {
-//   response.status(400).send("Welcome to educare em school");
-// });
+const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use("/home", homeRouter);
+app.use("/home", auth(), homeRouter);
+app.use("/user", auth(), userRouter);
+app.use("/public", publicRouter);
+app.use("/auth", authRouter);
