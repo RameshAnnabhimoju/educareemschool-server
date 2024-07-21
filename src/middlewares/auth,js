@@ -1,0 +1,33 @@
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+
+export default async function auth(request, response, next) {
+  try {
+    const { authorization } = request.headers;
+    if (!!authorization) {
+      jwt.verify(
+        authorization,
+        process.env.ACCESS_TOKEN_SECRET,
+        (error, client) => {
+          if (error) {
+            response
+              .status(401)
+              .json({
+                message: error?.message || "Token Expired",
+                type: "fail",
+              });
+          }
+          request.client = client;
+          next();
+        }
+      );
+    } else {
+      return response
+        .status(401)
+        .json({ message: "Unauthorized Access", type: "fail" });
+    }
+  } catch (error) {
+    return response.json({ message: error.message, type: "fail" });
+  }
+}
