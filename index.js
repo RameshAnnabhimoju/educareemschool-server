@@ -4,11 +4,13 @@ import userRouter from "./src/routes/user.router.js";
 import authRouter from "./src/routes/auth.router.js";
 import publicRouter from "./src/routes/public.router.js";
 import mongoose from "mongoose";
-import { configDotenv } from "dotenv";
+import cors from "cors";
 import auth from "./src/middlewares/auth,js";
-configDotenv();
+import { appConfigs } from "./src/config/appConfig.js";
+const { PORT, MONGO_URL } = appConfigs;
+app.use(cors({ origin: "*" }));
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(MONGO_URL)
   .then(() => {
     console.log("Connected to DB successfuly");
     app.listen(PORT, (error) => {
@@ -22,7 +24,6 @@ mongoose
     console.log("error connectiong to DB ", error);
   });
 const app = express();
-const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/home", auth, homeRouter);

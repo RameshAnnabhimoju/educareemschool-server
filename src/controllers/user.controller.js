@@ -1,8 +1,8 @@
 import user from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import { appConfigs } from "../config/appConfig.js";
+const { ACCESS_TOKEN_SECRET } = appConfigs;
 const salt = bcrypt.genSaltSync(10);
 export const createUser = async (request, response) => {
   const { username, password } = request.body;
@@ -105,10 +105,7 @@ export const userLogin = async (request, response) => {
         type: "fail",
       });
     }
-    const accessToken = jwt.sign(
-      { user: userDetails },
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    const accessToken = jwt.sign({ user: userDetails }, ACCESS_TOKEN_SECRET);
     return response.status(200).json({
       message: "Logged in Successfully",
       isLoggedin: true,
@@ -118,7 +115,9 @@ export const userLogin = async (request, response) => {
       type: "success",
     });
   } catch (error) {
-    return response.status(500).json({ message: error.message, type: "fail" });
+    return response
+      .status(500)
+      .json({ message: error.message, isLoggedin: false, type: "fail" });
   }
 };
 
