@@ -8,7 +8,8 @@ import cors from "cors";
 import auth from "./src/middlewares/auth,js";
 import { appConfigs } from "./src/config/appConfig.js";
 const { PORT, MONGO_URL } = appConfigs;
-app.use(cors({ origin: "*" }));
+const app = express();
+app.use(cors({ origin: "*", Credentials: true }));
 mongoose
   .connect(MONGO_URL)
   .then(() => {
@@ -23,7 +24,6 @@ mongoose
   .catch((error) => {
     console.log("error connectiong to DB ", error);
   });
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/home", auth, homeRouter);
